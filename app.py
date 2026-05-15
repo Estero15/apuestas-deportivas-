@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 🎨 ESTILO Y TITULO
+# 🎨 ESTILO
 st.markdown("""
 <style>
 .big-font {font-size:20px !important; font-weight:bold; color:#2ECC71;}
@@ -22,7 +22,7 @@ st.markdown("""
 st.title("⚽ SISTEMA DE PRONÓSTICOS - QUIÉN GANA + GOLES")
 st.markdown("---")
 
-# 📋 TODAS TUS LIGAS
+# 📋 LIGAS QUE PEDISTE
 ligas = [
     "🇲🇽 Liga MX",
     "🇩🇪 Bundesliga",
@@ -36,36 +36,21 @@ liga = st.selectbox("📌 Elige Liga / Torneo", ligas)
 st.subheader(f"✅ Analizando: {liga}")
 st.markdown("---")
 
-# 📅 PARTIDOS DISPONIBLES
+# 📅 PARTIDOS
 partidos_lista = {
-    "🇲🇽 Liga MX": [
-        "Chivas 🆚 América", "Tigres 🆚 Santos", "Cruz Azul 🆚 Pumas"
-    ],
-    "🇩🇪 Bundesliga": [
-        "Bayern 🆚 Dortmund", "Leverkusen 🆚 Leipzig", "Monchengladbach 🆚 Frankfurt"
-    ],
-    "🇫🇷 Liga Francesa (Ligue 1)": [
-        "PSG 🆚 Olympique Lyon", "Mónaco 🆚 Marsella", "Lille 🆚 Nice"
-    ],
-    "🇮🇹 Liga Italiana (Serie A)": [
-        "Inter 🆚 Juventus", "Napoli 🆚 Milan", "Roma 🆚 Atalanta"
-    ],
-    "🏆 UEFA Champions League": [
-        "Real Madrid 🆚 Arsenal", "Barcelona 🆚 Bayern", "Man City 🆚 PSG"
-    ],
-    "🌎 Mundial Fútbol 2026": [
-        "México 🆚 Estados Unidos", "Argentina 🆚 Francia", "Brasil 🆚 España"
-    ],
-    "🇺🇸 MLS": [
-        "Inter Miami 🆚 LA Galaxy", "NYC FC 🆚 Seattle Sounders", "Atlanta 🆚 Austin FC"
-    ]
+    "🇲🇽 Liga MX": ["Chivas 🆚 América", "Tigres 🆚 Santos", "Cruz Azul 🆚 Pumas"],
+    "🇩🇪 Bundesliga": ["Bayern 🆚 Dortmund", "Leverkusen 🆚 Leipzig", "Monchengladbach 🆚 Frankfurt"],
+    "🇫🇷 Liga Francesa (Ligue 1)": ["PSG 🆚 Olympique Lyon", "Mónaco 🆚 Marsella", "Lille 🆚 Nice"],
+    "🇮🇹 Liga Italiana (Serie A)": ["Inter 🆚 Juventus", "Napoli 🆚 Milan", "Roma 🆚 Atalanta"],
+    "🏆 UEFA Champions League": ["Real Madrid 🆚 Arsenal", "Barcelona 🆚 Bayern", "Man City 🆚 PSG"],
+    "🌎 Mundial Fútbol 2026": ["México 🆚 Estados Unidos", "Argentina 🆚 Francia", "Brasil 🆚 España"],
+    "🇺🇸 MLS": ["Inter Miami 🆚 LA Galaxy", "NYC FC 🆚 Seattle Sounders", "Atlanta 🆚 Austin FC"]
 }
 
 partido_elegido = st.selectbox("🔽 Selecciona el Partido", partidos_lista[liga])
 
-# 🧠 FUNCIÓN PREDICCIÓN (basado en estadísticas reales)
+# 🧠 FUNCIÓN DE PREDICCIÓN
 def predecir_partido(equipo1, equipo2):
-    # Fuerza de equipos
     fuerza = {
         "Chivas":78, "América":82, "Tigres":80, "Santos":74, "Cruz Azul":76, "Pumas":72,
         "Bayern":91, "Dortmund":85, "PSG":88, "Olympique Lyon":79,
@@ -77,33 +62,29 @@ def predecir_partido(equipo1, equipo2):
     f1 = fuerza.get(equipo1.split(" ")[0], 70)
     f2 = fuerza.get(equipo2.split(" ")[0], 70)
 
-    # Probabilidades
     prob_local = round(f1/(f1+f2)*100, 1)
     prob_empate = round((100 - abs(f1-f2))/4, 1)
     prob_visita = round(f2/(f1+f2)*100, 1)
 
-    # GOLES (promedio liga)
-    promedio_goles = 2.7
-    g1 = round(random.uniform(0.8, 3.2)*(f1/100))
-    g2 = round(random.uniform(0.6, 2.8)*(f2/100))
+    g1 = round(random.uniform(0.8, 3.2))
+    g2 = round(random.uniform(0.6, 2.8))
 
-    # RESULTADO FINAL
     if g1 > g2:
-        ganador = f"✅ GANA: {equipo1.split(' ')[0]}"
+        ganador = f"GANA: {equipo1.split(' ')[0]}"
         color = "verde"
     elif g2 > g1:
-        ganador = f"✅ GANA: {equipo2.split(' ')[0]}"
+        ganador = f"GANA: {equipo2.split(' ')[0]}"
         color = "verde"
     else:
-        ganador = "🤝 EMPATE"
+        ganador = "EMPATE"
         color = "azul"
 
     total_goles = g1 + g2
-    pronostico = f"{g1} - {g2}"
+    marcador = f"{g1} - {g2}"
 
-    return ganador, pronostico, total_goles, prob_local, prob_empate, prob_visita, color
+    return ganador, marcador, total_goles, prob_local, prob_empate, prob_visita, color
 
-# 🔘 BOTÓN PARA CALCULAR
+# 🔘 BOTÓN PREDICCIÓN
 if st.button("🔮 VER PRONÓSTICO COMPLETO", use_container_width=True):
     eq1, eq2 = partido_elegido.split(" 🆚 ")
     ganador, marcador, goles_totales, pl, pe, pv, color = predecir_partido(eq1, eq2)
@@ -111,22 +92,25 @@ if st.button("🔮 VER PRONÓSTICO COMPLETO", use_container_width=True):
     st.markdown("---")
     st.header("📊 RESULTADO PRONOSTICADO")
 
-    # 📌 QUIEN GANA
-    st.markdown(f'<p class="{color} big-font}🏆 {ganador}</p>', unsafe_allow_html=True)
+    # ✅ YA CORREGIDO AQUÍ
+    if color == "verde":
+        st.success(f"🏆 {ganador}")
+    elif color == "azul":
+        st.info(f"🤝 {ganador}")
+    else:
+        st.error(f"⚖️ {ganador}")
 
-    # ⚽ MARCADOR EXACTO
     st.success(f"📌 MARCADOR FINAL:  {marcador}")
     st.info(f"⚽ GOLES TOTALES EN EL PARTIDO: {goles_totales} goles")
 
-    # 📈 PROBABILIDADES
     col1, col2, col3 = st.columns(3)
     with col1: st.metric("🔵 Probabilidad Local", f"{pl} %")
     with col2: st.metric("⚪ Probabilidad Empate", f"{pe} %")
     with col3: st.metric("🔴 Probabilidad Visita", f"{pv} %")
 
-    st.warning("📌 *Predicción basada en rendimiento y estadísticas de cada equipo*")
+    st.warning("📌 Predicción basada en estadísticas")
 
-# 🧮 CALCULADORA DE APUESTA
+# 🧮 CALCULADORA
 st.markdown("---")
 st.header("🧮 CALCULA TU GANANCIA")
 monto = st.number_input("💰 Monto ($):", min_value=0.0)
